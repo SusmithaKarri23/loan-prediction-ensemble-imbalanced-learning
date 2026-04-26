@@ -1,0 +1,14 @@
+/* Additional custom styles */
+.card-hover:hover {
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    transform: translateY(-8px);
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+}

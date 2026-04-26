@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Simulation Results{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
+                        <h3 class="fw-bold">Simulation Results</h3>
+                        <h5 class="text-muted">{{ simulation.scenario_name }}</h5>
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                        <h1 class="display-3 fw-bold text-info">{{ simulation.eligibility_score }}%</h1>
+                        <p class="text-muted">Predicted Eligibility Score</p>
+                    </div>
+                    
+                    <div class="progress mb-4" style="height: 30px;">
+                        <div class="progress-bar bg-{% if simulation.eligibility_score >= 70 %}success{% elif simulation.eligibility_score >= 50 %}warning{% else %}danger{% endif %}" 
+                             style="width: {{ simulation.eligibility_score }}%">
+                            {{ simulation.eligibility_score }}%
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6 class="fw-bold">AI Recommendation:</h6>
+                        <p class="mb-0">{{ simulation.recommended_action }}</p>
+                    </div>
+                    
+                    <h5 class="fw-bold mt-4 mb-3">Simulation Parameters</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <small class="text-muted">Annual Income</small>
+                                    <h5 class="fw-bold mb-0">${{ simulation.simulated_income|floatformat:2 }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <small class="text-muted">Annual Expenses</small>
+                                    <h5 class="fw-bold mb-0">${{ simulation.simulated_expenses|floatformat:2 }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <small class="text-muted">Loan Amount</small>
+                                    <h5 class="fw-bold mb-0">${{ simulation.simulated_loan_amount|floatformat:2 }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <small class="text-muted">Credit Score</small>
+                                    <h5 class="fw-bold mb-0">{{ simulation.simulated_credit_score }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <small class="text-muted">Existing Debts</small>
+                                    <h5 class="fw-bold mb-0">${{ simulation.simulated_existing_debts|floatformat:2 }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <small class="text-muted">Duration</small>
+                                    <h5 class="fw-bold mb-0">{{ simulation.simulated_duration }} months</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 justify-content-center mt-4">
+                        <a href="{% url 'simulator:run_simulation' %}" class="btn btn-outline-info">
+                            <i class="fas fa-redo me-2"></i>New Simulation
+                        </a>
+                        <a href="{% url 'simulator:simulation_history' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-2"></i>View History
+                        </a>
+                        {% if simulation.eligibility_score >= 50 %}
+                        <a href="{% url 'loans:apply_loan' %}" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Apply for Loan
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

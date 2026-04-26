@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Financial Simulator{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-calculator fa-3x text-info mb-3"></i>
+                        <h3 class="fw-bold">Financial Behavior Simulator</h3>
+                        <p class="text-muted">Test "What If" scenarios for your loan eligibility</p>
+                    </div>
+                    
+                    <form method="post" action="{% url 'simulator:run_simulation' %}">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_scenario_name" class="form-label">Scenario Name</label>
+                            {{ form.scenario_name }}
+                            <small class="text-muted">e.g., "What if I earn 20% more?"</small>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_simulated_income" class="form-label">Simulated Annual Income ($)</label>
+                                {{ form.simulated_income }}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_simulated_expenses" class="form-label">Simulated Annual Expenses ($)</label>
+                                {{ form.simulated_expenses }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_simulated_loan_amount" class="form-label">Desired Loan Amount ($)</label>
+                                {{ form.simulated_loan_amount }}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_simulated_credit_score" class="form-label">Simulated Credit Score</label>
+                                {{ form.simulated_credit_score }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_simulated_existing_debts" class="form-label">Simulated Existing Debts ($)</label>
+                                {{ form.simulated_existing_debts }}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="id_simulated_duration" class="form-label">Loan Duration (Months)</label>
+                                {{ form.simulated_duration }}
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Tip:</strong> Adjust the values to see how different financial scenarios affect your loan eligibility.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-info w-100">
+                            <i class="fas fa-play me-2"></i>Run Simulation
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="{% url 'simulator:simulation_history' %}" class="text-muted">
+                    <i class="fas fa-history me-1"></i>View Simulation History
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

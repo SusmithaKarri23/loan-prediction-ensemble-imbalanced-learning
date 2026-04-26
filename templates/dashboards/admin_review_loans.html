@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Loan Applications{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold">Pending Loan Applications</h3>
+            <p class="text-muted">Review and approve/reject loan applications</p>
+        </div>
+        <a href="{% url 'dashboards:admin_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    {% if pending_loans %}
+    <div class="row">
+        {% for loan in pending_loans %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning bg-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Application #{{ loan.id }}</h5>
+                        <span class="badge bg-warning">Pending Review</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Applicant</small>
+                            <p class="fw-bold mb-0">{{ loan.user.get_full_name|default:loan.user.username }}</p>
+                            <small class="text-muted">{{ loan.user.email }}</small>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Loan Type</small>
+                            <p class="fw-bold mb-0">{{ loan.get_loan_type_display }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Loan Amount</small>
+                            <h4 class="text-primary mb-0">${{ loan.loan_amount|floatformat:0 }}</h4>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Duration</small>
+                            <h4 class="mb-0">{{ loan.loan_duration_months }} months</h4>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-4">
+                            <small class="text-muted">Annual Income</small>
+                            <p class="fw-bold mb-0">${{ loan.annual_income|floatformat:0 }}</p>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted">Credit Score</small>
+                            <p class="fw-bold mb-0">{{ loan.credit_score }}</p>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted">Existing Debts</small>
+                            <p class="fw-bold mb-0">${{ loan.existing_debts|floatformat:0 }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if loan.prediction_score %}
+                    <div class="mb-3">
+                        <small class="text-muted">AI Prediction Score</small>
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar bg-{% if loan.prediction_score >= 70 %}success{% elif loan.prediction_score >= 50 %}warning{% else %}danger{% endif %}" 
+                                 style="width: {{ loan.prediction_score }}%">
+                                {{ loan.prediction_score }}% Approval Probability
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">Purpose</small>
+                        <p class="mb-0">{{ loan.purpose|truncatewords:20 }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">Employment</small>
+                        <p class="mb-0">{{ loan.employment_status }}</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">Applied On</small>
+                        <p class="mb-0">{{ loan.created_at|date:"F d, Y - h:i A" }}</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <form method="post" id="review-form-{{ loan.id }}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Admin Notes (Optional)</label>
+                            <textarea name="admin_notes" class="form-control" rows="2" placeholder="Add your review notes..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" formaction="{% url 'dashboards:admin_approve_loan' loan.pk %}" 
+                                    class="btn btn-success flex-fill" 
+                                    onclick="return confirm('Are you sure you want to APPROVE this loan application?')">
+                                <i class="fas fa-check me-2"></i>Approve
+                            </button>
+                            <button type="submit" formaction="{% url 'dashboards:admin_reject_loan' loan.pk %}" 
+                                    class="btn btn-danger flex-fill"
+                                    onclick="return confirm('Are you sure you want to REJECT this loan application?')">
+                                <i class="fas fa-times me-2"></i>Reject
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-inbox fa-5x text-muted mb-3"></i>
+        <h4 class="text-muted">No Pending Applications</h4>
+        <p class="text-muted">All loan applications have been reviewed.</p>
+        <a href="{% url 'dashboards:admin_dashboard' %}" class="btn btn-primary mt-3">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

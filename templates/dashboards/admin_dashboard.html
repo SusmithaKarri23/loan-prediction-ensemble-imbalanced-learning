@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold">Admin Dashboard</h2>
+            <p class="text-muted">System overview and analytics</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row">
+        <div class="col-md-2">
+            <div class="stat-card">
+                <div class="text-center">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-2">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <p class="text-muted mb-1">Total Users</p>
+                    <h3 class="fw-bold mb-0">{{ total_users }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card">
+                <div class="text-center">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info mx-auto mb-2">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <p class="text-muted mb-1">Total Applications</p>
+                    <h3 class="fw-bold mb-0">{{ total_applications }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card">
+                <div class="text-center">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning mx-auto mb-2">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <p class="text-muted mb-1">Pending</p>
+                    <h3 class="fw-bold mb-0 text-warning">{{ pending_applications }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card">
+                <div class="text-center">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto mb-2">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <p class="text-muted mb-1">Approved</p>
+                    <h3 class="fw-bold mb-0 text-success">{{ approved_applications }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card">
+                <div class="text-center">
+                    <div class="stat-icon bg-danger bg-opacity-10 text-danger mx-auto mb-2">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <p class="text-muted mb-1">Rejected</p>
+                    <h3 class="fw-bold mb-0 text-danger">{{ rejected_applications }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="stat-card">
+                <div class="text-center">
+                    <div class="stat-icon bg-secondary bg-opacity-10 text-secondary mx-auto mb-2">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <p class="text-muted mb-1">Approval Rate</p>
+                    <h3 class="fw-bold mb-0">
+                        {% if total_applications > 0 %}
+                            {{ approved_applications|floatformat:0 }}%
+                        {% else %}
+                            0%
+                        {% endif %}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Applications Table -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title fw-bold mb-0">Recent Applications</h5>
+                        <a href="{% url 'dashboards:admin_review_loans' %}" class="btn btn-sm btn-primary">
+                            Review All
+                        </a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Duration</th>
+                                    <th>Credit Score</th>
+                                    <th>AI Score</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for loan in recent_applications %}
+                                <tr>
+                                    <td>#{{ loan.id }}</td>
+                                    <td>{{ loan.user.get_full_name|default:loan.user.username }}</td>
+                                    <td>{{ loan.get_loan_type_display }}</td>
+                                    <td>${{ loan.loan_amount|floatformat:0 }}</td>
+                                    <td>{{ loan.loan_duration_months }} months</td>
+                                    <td>{{ loan.credit_score }}</td>
+                                    <td>
+                                        {% if loan.prediction_score %}
+                                            <span class="badge bg-{% if loan.prediction_score >= 70 %}success{% elif loan.prediction_score >= 50 %}warning{% else %}danger{% endif %}">
+                                                {{ loan.prediction_score }}%
+                                            </span>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if loan.status == 'approved' %}success{% elif loan.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                            {{ loan.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>{{ loan.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if loan.status == 'pending' %}
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{% url 'dashboards:admin_approve_loan' loan.pk %}" class="btn btn-success" onclick="return confirm('Approve this loan?')">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                                <a href="{% url 'dashboards:admin_reject_loan' loan.pk %}" class="btn btn-danger" onclick="return confirm('Reject this loan?')">
+                                                    <i class="fas fa-times"></i>
+                                                </a>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">Reviewed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted">No applications</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loan Type Distribution -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Loan Type Distribution</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Loan Type</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in loan_type_stats %}
+                                <tr>
+                                    <td>{{ stat.loan_type|title }}</td>
+                                    <td>{{ stat.count }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" 
+                                                 style="width: {% widthratio stat.count total_applications 100 %}%">
+                                                {% widthratio stat.count total_applications 100 %}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">Quick Admin Actions</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'dashboards:admin_review_loans' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-tasks me-2"></i>Review Pending Loans
+                        </a>
+                        <a href="{% url 'dashboards:admin_users_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-users me-2"></i>Manage Users
+                        </a>
+                        <a href="{% url 'dashboards:admin_analytics' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-chart-bar me-2"></i>View Analytics
+                        </a>
+                        <a href="/admin/" class="btn btn-outline-secondary">
+                            <i class="fas fa-cog me-2"></i>Django Admin Panel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

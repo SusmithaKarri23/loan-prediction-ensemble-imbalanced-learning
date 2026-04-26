@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Eligibility Result{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        {% if score >= 70 %}
+                            <i class="fas fa-check-circle fa-5x text-success mb-3"></i>
+                            <h3 class="fw-bold text-success">High Approval Probability</h3>
+                        {% elif score >= 50 %}
+                            <i class="fas fa-exclamation-circle fa-5x text-warning mb-3"></i>
+                            <h3 class="fw-bold text-warning">Moderate Approval Probability</h3>
+                        {% else %}
+                            <i class="fas fa-times-circle fa-5x text-danger mb-3"></i>
+                            <h3 class="fw-bold text-danger">Low Approval Probability</h3>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h1 class="display-3 fw-bold">{{ score }}%</h1>
+                        <p class="text-muted">AI Prediction Score</p>
+                    </div>
+                    
+                    <div class="progress mb-4" style="height: 30px;">
+                        <div class="progress-bar bg-{% if score >= 70 %}success{% elif score >= 50 %}warning{% else %}danger{% endif %}" 
+                             style="width: {{ score }}%">
+                            {{ score }}%
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-{% if score >= 70 %}success{% elif score >= 50 %}warning{% else %}danger{% endif %} text-start">
+                        <h6 class="fw-bold">Recommendation:</h6>
+                        {% if score >= 70 %}
+                            <p class="mb-0">Your profile shows strong eligibility. You can proceed with the loan application with confidence.</p>
+                        {% elif score >= 50 %}
+                            <p class="mb-0">Your profile shows moderate eligibility. Consider improving your credit score or reducing existing debts before applying.</p>
+                        {% else %}
+                            <p class="mb-0">Your profile currently shows low eligibility. We recommend improving your financial health before applying. Consider:</p>
+                            <ul class="mb-0 mt-2">
+                                <li>Increasing your income</li>
+                                <li>Improving your credit score</li>
+                                <li>Reducing existing debts</li>
+                                <li>Requesting a smaller loan amount</li>
+                            </ul>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row text-start mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-2">
+                                <div class="card-body">
+                                    <small class="text-muted">Annual Income</small>
+                                    <h5 class="fw-bold mb-0">${{ data.annual_income|floatformat:2 }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-2">
+                                <div class="card-body">
+                                    <small class="text-muted">Loan Amount</small>
+                                    <h5 class="fw-bold mb-0">${{ data.loan_amount|floatformat:2 }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-2">
+                                <div class="card-body">
+                                    <small class="text-muted">Credit Score</small>
+                                    <h5 class="fw-bold mb-0">{{ data.credit_score }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light mb-2">
+                                <div class="card-body">
+                                    <small class="text-muted">Existing Debts</small>
+                                    <h5 class="fw-bold mb-0">${{ data.existing_debts|floatformat:2 }}</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="{% url 'loans:check_eligibility' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-redo me-2"></i>Check Again
+                        </a>
+                        {% if score >= 50 %}
+                        <a href="{% url 'loans:apply_loan' %}" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Apply for Loan
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'simulator:run_simulation' %}" class="btn btn-success">
+                            <i class="fas fa-calculator me-2"></i>Run Simulation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

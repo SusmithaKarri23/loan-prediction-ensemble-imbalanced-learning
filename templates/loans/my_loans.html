@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}My Loan Applications{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold">My Loan Applications</h3>
+            <p class="text-muted">Track all your loan applications</p>
+        </div>
+        <a href="{% url 'loans:apply_loan' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>New Application
+        </a>
+    </div>
+
+    {% if loans %}
+    <div class="row">
+        {% for loan in loans %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-{% if loan.status == 'approved' %}success{% elif loan.status == 'rejected' %}danger{% else %}warning{% endif %} bg-opacity-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Application #{{ loan.id }}</h5>
+                        <span class="badge bg-{% if loan.status == 'approved' %}success{% elif loan.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                            {{ loan.status|upper }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Loan Type</small>
+                            <p class="fw-bold mb-0">{{ loan.get_loan_type_display }}</p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Amount</small>
+                            <h4 class="text-primary mb-0">${{ loan.loan_amount|floatformat:0 }}</h4>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Duration</small>
+                            <p class="mb-0">{{ loan.loan_duration_months }} months</p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">AI Score</small>
+                            {% if loan.prediction_score %}
+                                <span class="badge bg-{% if loan.prediction_score >= 70 %}success{% elif loan.prediction_score >= 50 %}warning{% else %}danger{% endif %}">
+                                    {{ loan.prediction_score }}%
+                                </span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <small class="text-muted">Applied: {{ loan.created_at|date:"M d, Y" }}</small>
+                    
+                    <div class="mt-3">
+                        <a href="{% url 'loans:loan_status' loan.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="fas fa-eye me-2"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-file-invoice-dollar fa-5x text-muted mb-3"></i>
+        <h4 class="text-muted">No Applications Yet</h4>
+        <p class="text-muted">Apply for your first loan to get started.</p>
+        <a href="{% url 'loans:apply_loan' %}" class="btn btn-primary mt-3">
+            <i class="fas fa-plus me-2"></i>Apply for Loan
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Check Eligibility{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h3 class="fw-bold">Check Loan Eligibility</h3>
+                        <p class="text-muted">Get instant AI-powered eligibility assessment</p>
+                    </div>
+                    
+                    <form method="post" action="{% url 'loans:check_eligibility' %}">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="annual_income" class="form-label">Annual Income ($)</label>
+                                <input type="number" step="0.01" name="annual_income" class="form-control" required value="{{ user.profile.annual_income }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="loan_amount" class="form-label">Desired Loan Amount ($)</label>
+                                <input type="number" step="0.01" name="loan_amount" class="form-control" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="credit_score" class="form-label">Credit Score (300-850)</label>
+                                <input type="number" name="credit_score" class="form-control" required value="{{ user.profile.credit_score }}">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="existing_debts" class="form-label">Existing Debts ($)</label>
+                                <input type="number" step="0.01" name="existing_debts" class="form-control" required value="{{ user.profile.existing_loans }}">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="loan_duration" class="form-label">Loan Duration (Months)</label>
+                            <select name="loan_duration" class="form-select" required>
+                                <option value="">Select duration</option>
+                                <option value="12">12 months</option>
+                                <option value="24">24 months</option>
+                                <option value="36">36 months</option>
+                                <option value="48">48 months</option>
+                                <option value="60">60 months</option>
+                                <option value="84">84 months (7 years)</option>
+                                <option value="120">120 months (10 years)</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-calculator me-2"></i>Check Eligibility
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
