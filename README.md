@@ -49,3 +49,19 @@ This project focuses on improving loan approval prediction accuracy using advanc
 ---
 
 ## 📁 Project Structure
+
+---
+
+## 📸 Project Screenshots
+
+### 👤 User Dashboard
+![User Dashboard](images/user.png.png)
+
+### 🧾 Loan Eligibility Check
+![Eligibility Check](images/eligibility_check.png.png)
+
+### 🧮 Financial Simulator
+![Simulator](images/simulation.png.png)
+
+### 🛠️ Admin Dashboard
+![Admin Dashboard](images/admin.png.png)
